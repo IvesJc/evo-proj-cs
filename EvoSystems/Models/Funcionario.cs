@@ -12,5 +12,5 @@ public class Funcionario
 
     // One (departamento) To Many (funcionario)
     public int DepartamentoId { get; set; }
-    public Departamento Departamento { get; set; }
+    // public Departamento Departamento { get; set; }
 }

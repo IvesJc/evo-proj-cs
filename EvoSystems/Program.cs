@@ -1,4 +1,6 @@
 using EvoSystems.Data;
+using EvoSystems.Services.Departamento;
+using EvoSystems.Services.Funcionario;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,9 @@ builder.Services.AddDbContext<EvoSysContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection"));
 });
+
+builder.Services.AddScoped<IDepartamentoInterface, DepartamentoService>();
+builder.Services.AddScoped<IFuncionarioInterface, FuncionarioService>();
 
 var app = builder.Build();
 
