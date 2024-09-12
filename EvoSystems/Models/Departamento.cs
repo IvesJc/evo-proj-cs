@@ -7,5 +7,6 @@ public class Departamento
     public string Sigla { get; set; }
 
     // One (dep) To Many (func)
+    // public int FuncionarioId { get; set; }
     public List<Funcionario> Funcionarios { get; set; }
 }
