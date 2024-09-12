@@ -1,7 +1,10 @@
-﻿namespace EvoSystems.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EvoSystems.Models;
 
 public class Departamento
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public string Nome { get; set; }
     public string Sigla { get; set; }
