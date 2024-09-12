@@ -1,7 +1,9 @@
 ﻿namespace EvoSystems.Controllers.Funcionario.Dto;
 
-public record FuncionarioRequestDto(
-    string Nome,
-    string Foto,
-    string Rg,
-    int DepartamentoId);
+public class FuncionarioRequestDto
+{
+    public string Nome { get; set; }
+    public string Foto { get; set; }
+    public string Rg { get; set; }
+    public int DepartamentoId { get; set; }
+}
