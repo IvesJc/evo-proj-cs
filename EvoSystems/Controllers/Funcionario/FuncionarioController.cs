@@ -1,11 +1,10 @@
 using EvoSystems.Controllers.Funcionario.Dto;
 using EvoSystems.Services.Funcionario;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EvoSystems.Controllers.Funcionario
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class FuncionarioController : ControllerBase
     {
@@ -31,7 +30,7 @@ namespace EvoSystems.Controllers.Funcionario
             return Created(Uri.UriSchemeHttp, funcionario);
         }
 
-        [HttpPut("{idFunc}")]
+        [HttpPut("/{idFunc}")]
         public async Task<ActionResult<FuncionarioResonseDto>> UpdateFuncionario(int idFunc,
             FuncionarioRequestDto funcionarioRequestDto)
         {
@@ -39,7 +38,7 @@ namespace EvoSystems.Controllers.Funcionario
             return Ok(funcionario);
         }
 
-        [HttpDelete("{idFunc}")]
+        [HttpDelete("/{idFunc}")]
         public async Task<ActionResult<FuncionarioResonseDto>> DeleteFuncionario(int idFunc)
         {
             var funcionario = await _interface.DeleteFuncionario(idFunc);

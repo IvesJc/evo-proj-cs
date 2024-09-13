@@ -1,3 +1,4 @@
+using EvoSystems.Controllers.Exceptions;
 using EvoSystems.Data;
 using EvoSystems.Services.Departamento;
 using EvoSystems.Services.Funcionario;
@@ -16,6 +17,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<EvoSysContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection"));
+});
+
+// Add the ExceptionFilter as a service for controllers
+builder.Services.AddControllersWithViews(option =>
+{
+    option.Filters.Add<GlobalExceptionFilter>();
 });
 
 builder.Services.AddScoped<IDepartamentoInterface, DepartamentoService>();
