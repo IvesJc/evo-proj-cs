@@ -1,12 +1,13 @@
 ﻿using EvoSystems.Controllers.Departamento.Dto;
+using EvoSystems.Controllers.Exceptions;
 using EvoSystems.Data;
 using Microsoft.EntityFrameworkCore;
+using InvalidDataException = EvoSystems.Controllers.Exceptions.InvalidDataException;
 
 namespace EvoSystems.Services.Departamento;
 
 public class DepartamentoService : IDepartamentoInterface
 {
-
     private readonly EvoSysContext _context;
 
     public DepartamentoService(EvoSysContext context)
@@ -19,18 +20,22 @@ public class DepartamentoService : IDepartamentoInterface
         try
         {
             var departamentos = await _context.Departamentos.Include(dep => dep.Funcionarios).ToListAsync();
+            if (departamentos == null || !departamentos.Any())
+            {
+                throw new NotFoundException("No Departamentos were found!");
+            }
+
             var depatamentosDto = departamentos.Select(departamento => new DepartamentoResponseDto()
             {
                 Id = departamento.Id,
                 Nome = departamento.Nome,
                 Sigla = departamento.Sigla,
-
             }).ToList();
             return depatamentosDto;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("Error: " + e.Message);
             throw;
         }
     }
@@ -39,11 +44,23 @@ public class DepartamentoService : IDepartamentoInterface
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(departamentoRequestDto.Nome) ||
+                string.IsNullOrWhiteSpace(departamentoRequestDto.Sigla))
+            {
+                throw new InvalidDataException("Nome or Sigla are invalid!");
+            }
+
             var departamento = new Models.Departamento
             {
                 Nome = departamentoRequestDto.Nome,
                 Sigla = departamentoRequestDto.Sigla,
             };
+            if (string.IsNullOrWhiteSpace(departamentoRequestDto.Nome) ||
+                string.IsNullOrWhiteSpace(departamentoRequestDto.Sigla))
+            {
+                throw new InvalidDataException("Nome or Sigla are invalid!");
+            }
+
             _context.Departamentos.Add(departamento);
             await _context.SaveChangesAsync();
 
@@ -57,31 +74,38 @@ public class DepartamentoService : IDepartamentoInterface
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("Error: " + e.Message);
             throw;
         }
     }
 
-    public async Task<DepartamentoResponseDto> UpdateDepartamento(int idDep, DepartamentoRequestDto departamentoRequestDto)
+    public async Task<DepartamentoResponseDto> UpdateDepartamento(int idDep,
+        DepartamentoRequestDto departamentoRequestDto)
     {
-        var depExiste = _context.Departamentos.FirstOrDefault(dep => dep.Id == idDep);
-        if (depExiste != null)
+        if (string.IsNullOrWhiteSpace(departamentoRequestDto.Nome) ||
+            string.IsNullOrWhiteSpace(departamentoRequestDto.Sigla))
         {
-            depExiste.Nome = departamentoRequestDto.Nome;
-            depExiste.Sigla = departamentoRequestDto.Sigla;
-
-            _context.Update(depExiste);
-            await _context.SaveChangesAsync();
-            DepartamentoResponseDto departamentoResponseDto = new DepartamentoResponseDto
-            {
-                Id = depExiste.Id,
-                Nome = depExiste.Nome,
-                Sigla = depExiste.Sigla,
-            };
-            return departamentoResponseDto;
+            throw new InvalidDataException("Nome or Sigla are invalid!");
         }
 
-        throw new NotImplementedException();
+        var depExiste = _context.Departamentos.FirstOrDefault(dep => dep.Id == idDep);
+        if (depExiste == null)
+        {
+            throw new NotFoundException("Departamento not found with ID!");
+        }
+
+        depExiste.Nome = departamentoRequestDto.Nome;
+        depExiste.Sigla = departamentoRequestDto.Sigla;
+
+        _context.Update(depExiste);
+        await _context.SaveChangesAsync();
+        DepartamentoResponseDto departamentoResponseDto = new DepartamentoResponseDto
+        {
+            Id = depExiste.Id,
+            Nome = depExiste.Nome,
+            Sigla = depExiste.Sigla,
+        };
+        return departamentoResponseDto;
     }
 
     public async Task<DepartamentoResponseDto> DeleteDepartamento(int idDep)
@@ -89,24 +113,25 @@ public class DepartamentoService : IDepartamentoInterface
         try
         {
             var depExiste = _context.Departamentos.FirstOrDefault(dep => dep.Id == idDep);
-            if (depExiste != null)
+            if (depExiste == null)
             {
-                _context.Departamentos.Remove(depExiste);
-                await _context.SaveChangesAsync();
-                DepartamentoResponseDto departamentoResponseDto = new DepartamentoResponseDto
-                {
-                    Id = depExiste.Id,
-                    Nome = depExiste.Nome,
-                    Sigla = depExiste.Sigla,
-                };
-                return departamentoResponseDto;
+                throw new NotFoundException("Departamento not found with ID!");
             }
+
+            _context.Departamentos.Remove(depExiste);
+            await _context.SaveChangesAsync();
+            var departamentoResponseDto = new DepartamentoResponseDto
+            {
+                Id = depExiste.Id,
+                Nome = depExiste.Nome,
+                Sigla = depExiste.Sigla,
+            };
+            return departamentoResponseDto;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("Error: " + e.Message);
             throw;
         }
-        throw new NotImplementedException();
     }
 }
